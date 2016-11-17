@@ -24,7 +24,6 @@ requirements:
     - cdms2
     - cdutil
     - ffmpeg
-    - vcsaddons
     - requests
     - numpy
 

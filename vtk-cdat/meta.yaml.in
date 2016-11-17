@@ -23,20 +23,20 @@ requirements:
   build:
     - cmake
     - python
-    - proj4 >4.9.2
+    - proj4
     - hdf5 1.8.17
     - ffmpeg
     - freetype
     - mesalib                                 [linux] {nox}
-    - x264 <20151006.2245
+    - x264
   run:
     - python
-    - proj4 >4.9.2
+    - proj4
     - hdf5 1.8.17
     - ffmpeg
     - freetype
     - mesalib                                 [linux] {nox}
-    - x264 <20151006.2245
+    - x264
 
 about:
   home: http://www.vtk.org/

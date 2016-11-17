@@ -8,7 +8,7 @@ source:
 
 build:
   number: @BUILD_NUMBER@
- 
+
 requirements:
   build:
     - python
@@ -17,12 +17,14 @@ requirements:
     - numpy x.x
     - cdat_info
     - libdrs_f
+    - jpeg 8d
   run:
     - python
     - setuptools
     - libcdms
     - cdat_info
     - libdrs_f
+    - jpeg 8d
     - numpy x.x
 
 about:

@@ -12,9 +12,9 @@ build:
 
 requirements:
     build:
-        - jpeg
+        - jpeg 8d
     run:
-        - jpeg
+        - jpeg 8d
 
 about:
   home: http://www.ece.uvic.ca/~frodo/jasper/
