@@ -5,6 +5,7 @@ export LDFLAGS="-L${PREFIX}/lib"
 
 export GIT_DESCRIBE=`git describe --tags`
 
+
 cat > cdat_info.py.in << EOF
 
 Version = 'GIT_DESCRIBE'
@@ -71,13 +72,14 @@ def runCheck():
                             pass
                 f.close()
 
-        reload(cdat_info)
+        imp.reload(cdat_info)
         return val
+
 
 def askAnonymous(val):
         import cdat_info,os
         while cdat_info.ping_checked is False and not val in [True, False]: # couldn't get a valid value from env or file
-            val2 = raw_input("Allow anonymous logging usage to help improve UV-CDAT? (you can also set the environment variable UVCDAT_ANONYMOUS_LOG to yes or     no) [yes/no]")
+            val2 = input("Allow anonymous logging usage to help improve UV-CDAT? (you can also set the environment variable UVCDAT_ANONYMOUS_LOG to yes or     no) [yes/no]")
             if val2.lower() in ['y','yes','ok']:
                 val = True
             elif val2.lower() in ['n','no','not']:
@@ -88,11 +90,11 @@ def askAnonymous(val):
                     if not os.path.exists(os.path.join(os.path.expanduser("~"),".uvcdat")):
                         os.makedirs(os.path.join(os.path.expanduser("~"),".uvcdat"))
                     f=open(fanom,"w")
-                    print >>f, "#Store information about allowing UVCDAT anonymous logging"
-                    print >>f, "# Need sto be True or False"
-                    print >>f, "UVCDAT_ANONYMOUS_LOG: %s" % val
+                    print("#Store information about allowing UVCDAT anonymous logging", file=f)
+                    print("# Need sto be True or False", file=f)
+                    print("UVCDAT_ANONYMOUS_LOG: %s" % val, file=f)
                     f.close()
-                except Exception,err:
+                except Exception as err:
                     pass
         else:
             if cdat_info.ping_checked:
@@ -101,10 +103,11 @@ def askAnonymous(val):
         cdat_info.ping_checked = True
         check_in_progress = False
 
+
 def pingPCMDIdb(*args,**kargs):
     import cdat_info,os
     while cdat_info.check_in_progress:
-       reload(cdat_info)
+       imp.reload(cdat_info)
     val = cdat_info.runCheck()
     if val is False:
       cdat_info.ping_checked = True
@@ -125,6 +128,7 @@ def pingPCMDIdb(*args,**kargs):
     except:
         pass
 
+
 def pingPCMDIdbThread(*args,**kargs):
     import threading
     kargs['target']=submitPing
@@ -141,13 +145,14 @@ def pingPCMDIdbThread(*args,**kargs):
             t._Thread__stop()
         except:
             pass
+
 def submitPing(source,action,source_version=None):
   try:
-    import urllib2,sys,os,cdat_info,hashlib,urllib
+    import urllib.request, urllib.error, urllib.parse,sys,os,cdat_info,hashlib,urllib.request,urllib.parse,urllib.error
     if source in ['cdat','auto',None]:
       source = cdat_info.SOURCE
     if cdat_info.ping:
-      if not source in actions_sent.keys():
+      if not source in list(actions_sent.keys()):
         actions_sent[source]=[]
       elif action in actions_sent[source]:
         return
@@ -166,11 +171,12 @@ def submitPing(source,action,source_version=None):
       data['action']=action
       data['sleep']=cdat_info.sleep
       data['hashed_username']=hashlib.sha1(os.getlogin()).hexdigest()
-      urllib2.urlopen('http://uv-cdat.llnl.gov/UVCDATUsage/log/add/',urllib.urlencode(data))
-  except Exception,err:
+      urllib.request.urlopen('http://uv-cdat.llnl.gov/UVCDATUsage/log/add/',urllib.parse.urlencode(data))
+  except Exception as err:
     pass
 
 import os,sys
+import imp
 os.environ["UVCDAT_SETUP_PATH"] = sys.prefix
 CDMS_INCLUDE_DAP = 'yes'
 CDMS_DAP_DIR = '.'
@@ -197,8 +203,9 @@ EOF
 
 mkdir cdat_info_dir
 sed "s/GIT_DESCRIBE/${GIT_DESCRIBE}/g;" cdat_info.py.in > cdat_info_dir/cdat_info.py
+
 cat > cdat_info_dir/__init__.py << EOF
-from cdat_info import *
+from .cdat_info import *
 EOF
 
 cat > setup.py << EOF
@@ -210,5 +217,8 @@ setup (name = "cdat_info",
       )
 EOF
 
+#2to3 -w  cdat_info_dir/cdat_info.py
+#2to3 -w cdat_info_dir/__init__.py
+#2to3 -w setup.py
 $PYTHON setup.py install
 env
